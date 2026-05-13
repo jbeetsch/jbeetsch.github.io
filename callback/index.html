@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tesla OAuth Callback</title>
+  <style>
+    body { font-family: monospace; background: #0f172a; color: #f1f5f9; padding: 40px; max-width: 800px; }
+    h2 { color: #34d399; margin-bottom: 16px; }
+    .code-box {
+      background: #1e293b; border: 2px solid #334155;
+      padding: 20px; border-radius: 8px; word-break: break-all;
+      font-size: 0.85rem; margin: 16px 0; cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .code-box:hover { border-color: #34d399; }
+    .hint { color: #94a3b8; font-size: 0.85rem; margin: 8px 0; }
+    .copied { color: #34d399; font-weight: bold; }
+    .error { color: #f87171; }
+  </style>
+</head>
+<body>
+  <div id="content"></div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const error = params.get('error');
+    const div = document.getElementById('content');
+
+    if (code) {
+      div.innerHTML = `
+        <h2>✓ Tesla login successful</h2>
+        <p class="hint">Click the box below to copy the auth code, then paste it into the terminal:</p>
+        <div class="code-box" id="codebox">${code}</div>
+        <p class="hint" id="copy-hint">Click the box to copy</p>`;
+
+      document.getElementById('codebox').addEventListener('click', () => {
+        navigator.clipboard.writeText(code).then(() => {
+          document.getElementById('copy-hint').innerHTML = '<span class="copied">✓ Copied! Paste into your terminal.</span>';
+        });
+      });
+    } else if (error) {
+      div.innerHTML = `
+        <h2 class="error">Error: ${error}</h2>
+        <p>${params.get('error_description') || 'No description provided.'}</p>`;
+    } else {
+      div.innerHTML = `
+        <h2 class="error">No auth code received</h2>
+        <p>URL: <code>${window.location.href}</code></p>`;
+    }
+  </script>
+</body>
+</html>
